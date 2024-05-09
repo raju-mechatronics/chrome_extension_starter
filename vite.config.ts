@@ -13,7 +13,7 @@ export default defineConfig({
       },
     },
     watch: {
-      include: "src/**",
+      include: ["src/**", "public/**"],
       clearScreen: true,
     },
   },
