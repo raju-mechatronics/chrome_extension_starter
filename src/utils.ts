@@ -22,6 +22,7 @@ export function createState<T>(initial: T) {
     } else {
       state = newState as T;
     }
+    listeners.forEach((listener) => listener(state));
   };
 
   return {
@@ -40,3 +41,16 @@ export const waitUntil = async (condition: () => boolean, interval = 100) => {
     await wait(interval);
   }
 };
+
+export function hide(el: Element) {
+  el.setAttribute("hidden", "true");
+}
+
+export function show(el: Element) {
+  el.removeAttribute("hidden");
+}
+
+export function fillInputField(input: HTMLInputElement, value: string) {
+  input.value = value;
+  input.dispatchEvent(new Event("input", { bubbles: true }));
+}
