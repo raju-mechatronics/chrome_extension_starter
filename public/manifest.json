@@ -1,0 +1,21 @@
+{
+    "manifest_version": 3,
+    "name": "OFFER_URL_SHORTNER",
+    "version": "1.0",
+    "description": "This extension will shorten the URL",
+    "permissions": [
+        "tabs",
+        "activeTab",
+        "storage"
+    ],
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "index.js"
+            ]
+        }
+    ]
+}

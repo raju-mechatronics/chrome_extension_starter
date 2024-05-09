@@ -1,0 +1,9 @@
+.extension_container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  color: aliceblue;
+  background-color: #333;
+  z-index: 9999;
+} 
