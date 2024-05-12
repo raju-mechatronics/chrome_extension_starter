@@ -11,11 +11,13 @@
     "content_scripts": [
         {
             "matches": [
-                "https://affiliates.nordvpn.com/publisher/*"
+                "https://affiliates.nordvpn.com/publisher/*",
+                "https://surfshark.hasoffers.com/publisher/*"
             ],
             "js": [
                 "content.js"
-            ]
+            ],
+            "css": ["style.css"]
         }
     ]
 }
