@@ -21,13 +21,13 @@ selectedFileData.addListeners((value) => {
 
 function getUpdateButton() {
   return document.querySelector(
-    "#single-offer div.panel.sub-ids.open form button",
+    "#single-offer div.panel.sub-ids.open form button"
   ) as HTMLButtonElement | null;
 }
 
 function getTinyUrlSelectCheckbox() {
   return document.querySelector(
-    "#single-offer div.tiny-url > label > input",
+    "#single-offer div.tiny-url > label > input"
   ) as HTMLInputElement | null;
 }
 
@@ -37,7 +37,7 @@ function getTrackingURLField() {
 
 async function startFetching() {
   const addSubIdBtn = document.querySelector(
-    "#single-offer div.header > ul > li:nth-child(3)",
+    "#single-offer div.header > ul > li:nth-child(3)"
   ) as HTMLInputElement | null;
 
   if (addSubIdBtn && addSubIdBtn.className !== "active") {
@@ -70,7 +70,7 @@ async function startFetching() {
               datums[`Sub ID${i + 1}`]
                 ? // @ts-ignore
                   datums[`Sub ID${i + 1}`]
-                : "",
+                : ""
             );
           }
           getUpdateButton()?.click();
@@ -80,6 +80,13 @@ async function startFetching() {
           //@ts-ignore
           data[prevIndex]["url"] = trackingURL;
           prevIndex++;
+
+          if (prevIndex % 20 === 0) {
+            selectedFileData.setValue({
+              activeFileData: data,
+            });
+            await saveToStorage(selectedFileData.value()!);
+          }
         } else {
           break;
         }
