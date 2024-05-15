@@ -81,7 +81,7 @@ async function startFetching() {
           data[prevIndex]["url"] = trackingURL;
           prevIndex++;
 
-          if (prevIndex % 20 === 0) {
+          if (prevIndex % 3 === 0) {
             selectedFileData.setValue({
               activeFileData: data,
             });

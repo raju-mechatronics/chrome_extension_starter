@@ -2,6 +2,7 @@ import { createState } from "./utils.ts";
 
 type NordStorageId = `nord_storage_${number}`;
 type SharkVpnStorageId = `shark_vpn_storage_${number}`;
+type KapeStorageId = `kape_storage_${number}`;
 
 type RunningState = {
   status: "running" | "idle" | "error" | "paused";
@@ -25,11 +26,11 @@ export type StorageData = {
 };
 
 export type STATE = {
-  [key in NordStorageId | SharkVpnStorageId]: StorageData;
+  [key in NordStorageId | SharkVpnStorageId | KapeStorageId]: StorageData;
 };
 
 export const selectedFileData = createState<RunningState | undefined>(
-  undefined,
+  undefined
 );
 export const viewTableData = createState(false);
 
@@ -47,6 +48,10 @@ export const saveToStorage = async (runningState: RunningState) => {
   } else if (document.URL.includes("surfshark")) {
     await chrome.storage.local.set({
       ["shark_vpn_storage_" + data.id]: data,
+    });
+  } else if (document.URL.includes("kape")) {
+    await chrome.storage.local.set({
+      ["kape_storage_" + data.id]: data,
     });
   }
 };

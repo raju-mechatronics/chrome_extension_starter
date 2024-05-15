@@ -55,7 +55,7 @@ export const createButton = (
   text: string,
   color: string,
   onClick: (e: MouseEvent) => void,
-  parent: HTMLElement,
+  parent: HTMLElement
 ) => {
   const button = document.createElement("button");
   button.innerText = text;
@@ -84,7 +84,7 @@ const createUploadButton = () => {
     "Upload",
     "blue",
     () => uploadButton.click(),
-    container,
+    container
   );
   container.appendChild(button);
 
@@ -93,7 +93,7 @@ const createUploadButton = () => {
     const file = e.target?.files[0];
     Papa.parse(file, {
       header: true,
-      complete: (result) => {
+      complete: (result: any) => {
         selectedFileData.setValue({
           activeFileName: file.name,
           activeFileData: result.data.filter((e: any) => {
@@ -109,7 +109,7 @@ const createUploadButton = () => {
           status: "idle",
         });
       },
-      error: (error) => {
+      error: (error: unknown) => {
         console.log(error);
       },
     });
@@ -124,7 +124,7 @@ const tableView = createButton(
   () => {
     viewTableData.setValue(!viewTableData.value());
   },
-  container,
+  container
 );
 const uploadButton = createUploadButton();
 const stopButton = createButton(
@@ -137,7 +137,7 @@ const stopButton = createButton(
     }
     selectedFileData.setValue(undefined);
   },
-  container,
+  container
 );
 const startButton = createButton(
   "Start",
@@ -148,7 +148,7 @@ const startButton = createButton(
         status: "running",
       });
   },
-  container,
+  container
 );
 const pauseButton = createButton(
   "Pause",
@@ -159,7 +159,7 @@ const pauseButton = createButton(
         status: "paused",
       });
   },
-  container,
+  container
 );
 
 const resumeButton = createButton(
@@ -171,7 +171,7 @@ const resumeButton = createButton(
         status: "running",
       });
   },
-  container,
+  container
 );
 
 hide(startButton);
@@ -233,14 +233,14 @@ tableDialog.addEventListener("click", (e) => {
 });
 
 function renderTable(
-  rows: { index: number; id: string; name: string; dataCount: number }[],
+  rows: { index: number; id: string; name: string; dataCount: number }[]
 ) {
   const tableBody = tableDialog.querySelector("tbody");
   if (tableBody) {
     tableBody.innerHTML = "";
     rows.forEach((row) => {
       tableBody.appendChild(
-        createRow(row.index, row.id, row.name, row.dataCount),
+        createRow(row.index, row.id, row.name, row.dataCount)
       );
     });
   }
@@ -296,11 +296,12 @@ hide(container);
 setInterval(() => {
   if (
     document.URL.startsWith(
-      "https://affiliates.nordvpn.com/publisher/#!/offer/",
+      "https://affiliates.nordvpn.com/publisher/#!/offer/"
     ) ||
     document.URL.startsWith(
-      "https://surfshark.hasoffers.com/publisher/#!/offer/",
-    )
+      "https://surfshark.hasoffers.com/publisher/#!/offer/"
+    ) ||
+    document.URL.startsWith("https://affiliates.kape.com/publisher/#!/offer/")
   ) {
     if (container.hidden) show(container);
   } else {

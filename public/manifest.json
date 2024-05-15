@@ -12,12 +12,15 @@
         {
             "matches": [
                 "https://affiliates.nordvpn.com/publisher/*",
-                "https://surfshark.hasoffers.com/publisher/*"
+                "https://surfshark.hasoffers.com/publisher/*",
+                "https://affiliates.kape.com/publisher/*"
             ],
             "js": [
                 "content.js"
             ],
-            "css": ["style.css"]
+            "css": [
+                "style.css"
+            ]
         }
     ]
 }
