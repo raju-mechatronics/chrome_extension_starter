@@ -13,6 +13,6 @@
     "vite": "^5.2.0"
   },
   "dependencies": {
-    "@types/chrome": "^0.0.267"
+    "@types/chrome": "^0.0.267",
   }
 }
