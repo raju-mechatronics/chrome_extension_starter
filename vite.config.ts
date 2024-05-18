@@ -6,7 +6,8 @@ export default defineConfig({
     minify: false,
     rollupOptions: {
       input: {
-        content: "src/index.ts",
+        content: "src/content.ts",
+        background: "src/background.ts",
       },
       output: {
         entryFileNames: "[name].js",

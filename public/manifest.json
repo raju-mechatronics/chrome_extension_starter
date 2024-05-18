@@ -8,10 +8,13 @@
         "activeTab",
         "storage"
     ],
+    "background": {
+        "service_worker": "background.js"
+    },
     "content_scripts": [
         {
             "matches": [
-                "https://affiliates.nordvpn.com/publisher/*"
+                "https://studio.youtube.com/video/*/edit*"
             ],
             "js": [
                 "content.js"
