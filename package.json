@@ -14,5 +14,6 @@
   },
   "dependencies": {
     "@types/chrome": "^0.0.267",
+    "xlsx": "^0.18.5"
   }
 }

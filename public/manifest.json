@@ -1,8 +1,8 @@
 {
     "manifest_version": 3,
-    "name": "OFFER_URL_SHORTNER",
+    "name": "Video_Meta_Edit",
     "version": "1.0",
-    "description": "This extension will shorten the URL",
+    "description": "replace the video meta data with the one in the description",
     "permissions": [
         "tabs",
         "activeTab",

@@ -12,7 +12,7 @@ export function createState<T>(initial: T) {
   };
 
   const setValue = (
-    newState: T extends object ? (T extends any[] ? T : Partial<T>) : T,
+    newState: T extends object ? (T extends any[] ? T : Partial<T>) : T
   ) => {
     if (typeof newState === "object" && !Array.isArray(newState)) {
       state = {
@@ -42,12 +42,12 @@ export const waitUntil = async (condition: () => boolean, interval = 100) => {
   }
 };
 
-export function hide(el: Element) {
-  el.setAttribute("hidden", "true");
+export function hide(...el: Element[]) {
+  el.forEach((el) => el.setAttribute("hidden", "true"));
 }
 
-export function show(el: Element) {
-  el.removeAttribute("hidden");
+export function show(...el: Element[]) {
+  el.forEach((el) => el.removeAttribute("hidden"));
 }
 
 export function fillInputField(input: HTMLInputElement, value: string) {
