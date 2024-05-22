@@ -33,7 +33,7 @@ async function handleButtonChange() {
     interupter = false;
     hide(uploadBtn, runButton, resumeButton);
     show(stopButton, pauseButton);
-    runBot(data.dataList);
+    runBot();
   }
 }
 

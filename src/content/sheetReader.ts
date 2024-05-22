@@ -49,6 +49,9 @@ function parseWorkbookToJson(workBook: WorkBook, sheetName?: string) {
           sheet[String.fromCharCode(col) + row]?.v;
       }
     }
+    if (Object.keys(unitResult).length === 0) {
+      continue;
+    }
     unitResult["completed"] = false;
     parseResult.push(unitResult);
   }

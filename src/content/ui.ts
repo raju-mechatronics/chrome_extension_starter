@@ -77,7 +77,7 @@ const resumeButton = createButton("Resume", {
   },
 });
 
-uploadBtn.onchange = async (e) => {
+uploadBtn.onchange = async () => {
   const file = uploadBtn.files?.[0];
   if (!file) {
     return;

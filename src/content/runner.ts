@@ -4,7 +4,6 @@ import { DataUnit, Headings, StateStorage } from "./types";
 
 async function formatStringToWrite(data: DataUnit, str: string) {
   const keys = Object.keys(data) as (keyof DataUnit)[];
-  // {"current 1" : "replace 1"}
   for (const key of keys) {
     if (key.startsWith("current")) {
       const currentIndex = key.split(" ")[1];
@@ -17,19 +16,25 @@ async function formatStringToWrite(data: DataUnit, str: string) {
   return str;
 }
 
-async function updateList(data: StateStorage["dataList"], updateIndex: number) {
-  const updatedData = data.map((item, index) => {
-    if (index === updateIndex) {
-      return { ...item, completed: true };
-    } else {
-      return item;
+async function updateList(currentData: DataUnit) {
+  const { dataList } = (await chrome.storage.local.get("dataList")) as {
+    dataList: DataUnit[];
+  };
+  if (!dataList) {
+    chrome.storage.local.clear();
+  }
+  // find the current data unit and mark it as completed
+  const updatedData = dataList.map((data) => {
+    if (JSON.stringify(data) === JSON.stringify(currentData)) {
+      return { ...data, completed: true };
     }
+    return data;
   });
   await chrome.storage.local.set({ dataList: updatedData });
   return updatedData;
 }
 
-async function findCurrentUndoneIndex(data: StateStorage["dataList"]) {
+function findCurrentUndoneIndex(data: StateStorage["dataList"]) {
   for (let i = 0; i < data.length; i++) {
     if (data[i].completed) {
       continue;
@@ -40,21 +45,139 @@ async function findCurrentUndoneIndex(data: StateStorage["dataList"]) {
   return -1;
 }
 
-export async function runBot(dataList: DataUnit[]) {
-  const currentData = await chrome.storage.local.get(["dataList"]);
-  const data = currentData.dataList;
-  if (!data) {
+async function getCurrentDataUnit() {
+  const { dataList } = (await chrome.storage.local.get("dataList")) as {
+    dataList: DataUnit[];
+  };
+  if (!dataList) {
     return;
   }
-  const currentDataIndex = await findCurrentUndoneIndex(data);
-  if (currentDataIndex === -1) {
-    console.log("finished");
+  const currentDataUnitIndex = findCurrentUndoneIndex(dataList);
+  if (currentDataUnitIndex === -1) {
+    return;
+  }
+  const currentDataUnit = dataList[currentDataUnitIndex];
+  if (!currentDataUnit) {
+    return;
+  }
+  return currentDataUnit;
+}
+
+function completed() {
+  chrome.storage.local.clear();
+  console.log("completed");
+  return;
+}
+
+async function initChannelSwitch() {
+  const currentData = await getCurrentDataUnit();
+  if (!currentData) {
+    completed();
+    return;
+  }
+  await chrome.storage.local.set({
+    switchChannelto: currentData["channel name"],
+  });
+  location.href = "https://www.youtube.com/channel_switcher";
+}
+
+function isChannelSwitchPage() {
+  return window.location.href.startsWith("https://www.youtube.com/account");
+}
+
+async function switchChannel() {
+  const { switchChannelto } = (await chrome.storage.local.get(
+    "switchChannelto"
+  )) as { switchChannelto: string };
+  if (!switchChannelto) {
+    return;
+  }
+  const currentData = await getCurrentDataUnit();
+  if (!currentData) {
+    completed();
+    return;
+  }
+  const channelName = currentData["channel name"].trim();
+  const channelNames = document.querySelectorAll(
+    "#channel-title"
+  ) as NodeListOf<HTMLElement>;
+  if (channelNames.length === 0) {
+    return completed();
+  }
+  for (const channel of channelNames) {
+    if (channel.textContent === channelName) {
+      channel.click();
+      return;
+    }
+  }
+}
+
+async function isSwitchingChannel() {
+  const fromStorage = await chrome.storage.local.get("switchChannelto");
+  return !!fromStorage.switchChannelto;
+}
+
+async function goToStudio() {
+  const avtBtn = document.querySelector(
+    "#avatar-btn"
+  ) as HTMLButtonElement | null;
+  if (!avtBtn) {
+    return;
+  }
+  avtBtn.click();
+  await wait(1000);
+  const studioNavigateBtn = document.querySelector(
+    "#items > ytd-compact-link-renderer a[href*=studio]"
+  ) as HTMLButtonElement | null;
+  if (!studioNavigateBtn) {
+    return;
+  }
+  studioNavigateBtn.click();
+  chrome.storage.local.remove("switchChannelto");
+}
+
+async function isRunning() {
+  const runningStorage = (await chrome.storage.local.get("running")) as {
+    running: "running" | "paused" | "idle";
+  };
+  return runningStorage?.running === "running";
+}
+
+export async function runBot() {
+  await wait(5000);
+  if (!(await isRunning())) {
+    return;
+  }
+  if (isErrorPage()) {
+    await wait(100);
+    initChannelSwitch();
+    return;
+  }
+
+  if (await isSwitchingChannel()) {
+    if (isChannelSwitchPage()) {
+      await switchChannel();
+      return;
+    }
+
+    return goToStudio();
+  }
+  const currentData = await getCurrentDataUnit();
+  if (!currentData) {
     chrome.storage.local.clear();
+    console.log("completed");
     return;
   } else {
-    const currentData = data[currentDataIndex];
+    console.log(currentData);
+    if (!currentData) {
+      return;
+    }
     const { "channel name": channelName, "unique video id": videoId } =
       currentData;
+    console.log(videoId, channelName);
+    if (getCurrentVideoId() !== videoId) {
+      return updateVideoURL(videoId);
+    }
     const descriptionBox = getDescriptionBox() as HTMLElement | null;
     if (!descriptionBox) {
       return;
@@ -66,10 +189,13 @@ export async function runBot(dataList: DataUnit[]) {
       currentData,
       description
     );
-    writeString(formattedDescription, true);
-    return;
+    // const res = await writeString(formattedDescription, true);
+    const res = { status: "ok" };
+    console.log(res);
+    await wait(1000);
+    await updateList(currentData);
   }
-  updateList(dataList, await findCurrentUndoneIndex(dataList));
+  return runBot();
 }
 
 function getSaveBtn() {
@@ -103,4 +229,14 @@ function updateVideoURL(videoId: string) {
 
 function getDescriptionBox() {
   return document.querySelectorAll("#textbox")[1];
+}
+
+function isErrorPage() {
+  console.log("error page");
+  return (
+    location.href.match(/https:\/\/studio.youtube.com\/video\/.*\/edit/gi) &&
+    document.querySelector("ytcp-error-section:not([hidden])") &&
+    document.getElementById("error-message")?.textContent ===
+      "Oops, something went wrong."
+  );
 }
