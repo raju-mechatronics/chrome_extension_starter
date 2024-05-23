@@ -1,4 +1,1 @@
-import { read, WorkBook } from "xlsx";
-
-// read from xlsx file
-
+console.log("hello");

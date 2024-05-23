@@ -1,13 +1,16 @@
 {
     "manifest_version": 3,
-    "name": "Video_Meta_Edit",
+    "name": "PDF 2 Form",
     "version": "1.0",
-    "description": "replace the video meta data with the one in the description",
+    "description": "Read PDF and fill form with it.",
     "permissions": [
         "tabs",
         "activeTab",
         "storage"
     ],
+    "action": {
+        "default_popup": "index.html"
+    },
     "background": {
         "service_worker": "background.js"
     },
