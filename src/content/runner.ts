@@ -189,20 +189,30 @@ export async function runBot() {
       currentData,
       description
     );
-    // const res = await writeString(formattedDescription, true);
-    const res = { status: "ok" };
-    console.log(res);
+    if (formattedDescription !== description) {
+      const res = await writeString(formattedDescription, true);
+      // const res = { status: "ok" };
+
+      console.log(res);
+    }
     await wait(1000);
+    const saveBtn = getSaveBtn();
+    if (!saveBtn) {
+      return;
+    }
+    saveBtn.click();
+    await waitSaveComplete();
     await updateList(currentData);
   }
   return runBot();
 }
 
 function getSaveBtn() {
-  return document.querySelector("#save");
+  return document.querySelector("#save") as HTMLElement | null;
 }
 
 async function waitSaveComplete() {
+  await wait(5000);
   const loadChangeEl = document.querySelector(
     "#entity-page"
   ) as HTMLDivElement | null;
