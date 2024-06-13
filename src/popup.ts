@@ -22,9 +22,9 @@ fileInput.addEventListener("change", async (e) => {
   const file = e.target?.files[0];
   if (file) {
     const text = await readText(file);
-    console.log({ text });
+    // console.log({ text });
+    console.log(extractInfo(text));
   }
-  // extractData(text);
 });
 
 async function processPDF(data: Uint8Array) {
@@ -41,33 +41,72 @@ async function processPDF(data: Uint8Array) {
     });
   }
 
-  console.log(textContent);
   return textContent;
 }
 
-function extractData(text: string) {
-  const data: { [key: string]: string | string[] } = {};
-  const medications: string[] = [];
-  const lines = text.split("\n");
+interface Medication {
+  name: string;
+  qty: string;
+  dosage: string;
+}
 
-  lines.forEach((line) => {
-    if (line.includes("Patient:")) {
-      data["Patient"] = line.split("Patient:")[1].trim();
-    } else if (line.includes("Patient Address:")) {
-      data["Patient Address"] = line.split("Patient Address:")[1].trim();
-    } else if (line.includes("Date of Birth:")) {
-      data["Date of Birth"] = line.split("Date of Birth:")[1].trim();
-    } else if (line.includes("NHS Number:")) {
-      data["NHS Number"] = line.split("NHS Number:")[1].trim();
-    } else if (line.match(/\d+mg|\d+micrograms/)) {
-      medications.push(line.trim());
-    }
+interface PatientInfo {
+  name: string;
+  address: string;
+  dob: string;
+  nhsNumber: string;
+  medications: Medication[];
+}
+
+const extractInfo = (text: string): PatientInfo => {
+  const nameMatch = text.match(/Patient\s*:\s*([^]+?)\s*Patient\s*Address\s*:/);
+  const addressMatch = text.match(
+    /Patient\s*Address\s*:\s*([^]+?)\s*Date\s*of\s*Birth\s*:/
+  );
+  const dobMatch = text.match(
+    /Date\s*of\s*Birth\s*:\s*([^]+?)\s*NHS\s*Number\s*:/
+  );
+  const nhsNumberMatch = text.match(/NHS\s*Number\s*:\s*([^]+?)\s*We\s*have/);
+
+  const medicationMatches = text.match(
+    /Medication\s*Qty\s*Dosage\s*Notes\s*([^]+?)\s*Requested by:/
+  );
+  const medicationsText = medicationMatches ? medicationMatches[1].trim() : "";
+
+  const medicationLines = medicationsText
+    .split(/\s*(?=\d)/)
+    .filter((line) => line.trim() !== "");
+
+  const getType = (name: string): string => {
+    if (/tablet|pill|capsule/i.test(name)) return "Pills";
+    if (/spray/i.test(name)) return "Nasal Spray";
+    if (/drop/i.test(name)) return "Drops";
+    return "Other";
+  };
+
+  console.log(medicationLines);
+
+  const medications: Medication[] = medicationLines.map((line) => {
+    const [name, qtyDosage] = line.split(/\s+(?=\d)/);
+    const [qty, ...dosageParts] = qtyDosage?.split(" ");
+    const dosage = dosageParts?.join(" ");
+    const type = getType(name?.trim());
+    return {
+      name: name.trim(),
+      qty: qty.trim(),
+      dosage: dosage.trim(),
+      type: type,
+    };
   });
 
-  data["Medications"] = medications;
-
-  displayData(data);
-}
+  return {
+    name: nameMatch ? nameMatch[1].trim() : "",
+    address: addressMatch ? addressMatch[1].trim() : "",
+    dob: dobMatch ? dobMatch[1].trim() : "",
+    nhsNumber: nhsNumberMatch ? nhsNumberMatch[1].trim() : "",
+    medications: medications,
+  };
+};
 
 function displayData(data: { [key: string]: string | string[] }) {
   const outputHtml = `
